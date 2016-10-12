@@ -1,0 +1,27 @@
+{
+  "name": "cape66",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "exports-loader": "^0.6.3",
+    "html-webpack-plugin": "^2.16.1",
+    "html-webpack-template": "^4.0.0",
+    "madewithlove-webpack-config": "^4.0.1",
+    "webpack": "^1.13.0",
+    "webpack-dev-server": "^1.14.1"
+  },
+  "dependencies": {
+    "angular": "^1.5.5",
+    "angular-local-storage": "^0.2.7",
+    "angular-resource": "^1.5.5",
+    "angular-ui-router": "^0.2.18",
+    "ui-router-metatags": "^1.0.3"
+  },
+  "keywords": [],
+  "author": "mnzaki@gmail.com",
+  "license": "Proprietary"
+}
