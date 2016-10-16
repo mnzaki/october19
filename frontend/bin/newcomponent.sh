@@ -12,7 +12,7 @@ export default {
       'ngInject';
     }
 
-    $onInit() {
+    \$onInit() {
       'ngInject';
     }
   }
