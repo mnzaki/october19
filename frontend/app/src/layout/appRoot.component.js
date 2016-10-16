@@ -5,7 +5,7 @@ import twoColumnLayoutUrl from './appRoot.2col.html';
 export default {
   templateUrl,
 
-  controller: function($rootScope) {
+  controller: function($state, $rootScope, $timeout) {
     'ngInject';
 
     this.layouts = {
@@ -17,8 +17,11 @@ export default {
     var updateLayout = (layout) => {
       this.layout = this.layouts[layout || this.layouts.default];
     }
-    updateLayout();
-    $rootScope.$on('$stateChangeSuccess',
+    $timeout(() => {
+      updateLayout($state.current.layout);
+    });
+
+    $rootScope.$on('$stateChangeStart',
                    (event, toState) => updateLayout(toState.layout));
   }
 }

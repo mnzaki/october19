@@ -21,12 +21,6 @@ export default angular.module('core', [
     $http.defaults.xsrfCookieName = 'csrftoken';
     */
 
-    var matchHtmlPage = /^\/[^\/]+\.html/;
-    if (matchHtmlPage.test($location.path())) {
-      $location.path($location.hash());
-      $location.hash('');
-    }
-
     if (!$location.path()) $location.path('/');
   })
   .name;

@@ -3,6 +3,7 @@ import uiRouter from 'angular-ui-router';
 
 import core from './core';
 import layout from './layout';
+import home from './home';
 import resourceDefinitions from './resources';
 
 angular.module('app', [
@@ -10,6 +11,7 @@ angular.module('app', [
 
   core,
   layout,
+  home
 ])
   .service('resources', function(resource) {
     'ngInject';
