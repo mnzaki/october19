@@ -12,4 +12,21 @@ export default angular.module('core', [
 ])
   .provider('resource', ResourceProvider)
   .provider('authentication', AuthenticationProvider)
+  .run(($location, $http) => {
+    'ngInject';
+
+    /* for django server defaults
+     *
+    $http.defaults.xsrfHeaderName = 'X-CSRFToken';
+    $http.defaults.xsrfCookieName = 'csrftoken';
+    */
+
+    var matchHtmlPage = /^\/[^\/]+\.html/;
+    if (matchHtmlPage.test($location.path())) {
+      $location.path($location.hash());
+      $location.hash('');
+    }
+
+    if (!$location.path()) $location.path('/');
+  })
   .name;
