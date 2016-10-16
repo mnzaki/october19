@@ -22,6 +22,11 @@ config.merge({
       title: 'Goyastores',
       baseHref: '/',
       devServer: config.debug ? 'http://localhost:8080' : undefined,
+
+      externalStylesheets: [
+        "https://fonts.googleapis.com/css?family=Raleway"
+      ],
+
       /*
       googleAnalytics: {
         trackingId: 'UA-XXXX-XX',
