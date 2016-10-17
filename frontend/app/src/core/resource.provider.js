@@ -19,13 +19,13 @@ export default class ResourceProvider {
     };
 
     return {
-      createResoure,
+      createResource,
       createResources
     };
 
     function createResources(resourceDefs) {
       angular.forEach(resourceDefs, function(val, key) {
-        createResoure(key, val);
+        createResource(key, val);
       });
       return provider.resources;
     }
@@ -56,7 +56,7 @@ export default class ResourceProvider {
      *
      * @returns {Object} the class resulting from calling $resource()
      */
-    function createResoure(resourceName, opts) {
+    function createResource(resourceName, opts) {
       // default options
       var options = {
         name: resourceName,
