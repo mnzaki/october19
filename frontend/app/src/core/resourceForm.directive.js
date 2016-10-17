@@ -5,76 +5,75 @@ export default ($q, $compile) => {
   return {
     restrict: 'A',
     require: 'form',
-    link: function ($scope, $element, $attrs, formCtrl) {
+    compile: (elem, attrs, transclude) => {
       // add ng-model to all inputs with a name
-      var recompile = false;
-      angular.forEach($element[0].querySelectorAll('input[name]'), (el) => {
-        recompile = recompile || !!!el.getAttribute('ng-model');
-        el.setAttribute('ng-model', $attrs.resourceForm + '.' + el.getAttribute('name'));
+      angular.forEach(elem[0].querySelectorAll('input[name]'), (el) => {
+        el.setAttribute('ng-model', attrs.resourceForm + '.' + el.getAttribute('name'));
       });
-      if (recompile) return $compile($element)($scope);
 
-      var resource = formCtrl.resource = $scope.$eval($attrs.resourceForm);
+      return ($scope, $element, $attrs, formCtrl) => {
+        var resource = formCtrl.resource = $scope.$eval($attrs.resourceForm);
 
-      formCtrl.$submitResource = submitResource;
-      formCtrl.$setValue = setValue;
+        formCtrl.$submitResource = submitResource;
+        formCtrl.$setValue = setValue;
 
-      // FIXME check if element is a <form> and only then .on('submit')
-      // but it doesn't hurt anyway
-      $element.on('submit', formCtrl.$submitResource);
+        // FIXME check if element is a <form> and only then .on('submit')
+        // but it doesn't hurt anyway
+        $element.on('submit', formCtrl.$submitResource);
 
-      function setValue(key, val) {
-        var ctrl = formCtrl[key];
-        resource[key] = ctrl.$modelValue = val;
-        ctrl.$setDirty();
-      }
-
-      function submitResource() {
-        if (formCtrl.$invalid) {
-          // touch all untouched invalid fields, to activate errors
-          var untouchedInvalidFields =
-            $element[0].querySelectorAll(invalidSelector + '.ng-untouched');
-          angular.forEach(untouchedInvalidFields, function (el) {
-            angular.element(el).controller('ngModel').$setTouched();
-          });
-
-          // focus the first invalid field
-          var firstInvalid = $element[0].querySelector(invalidSelector);
-          if (firstInvalid) firstInvalid.focus();
-
-          // and bail out
-          return $q.reject();
+        function setValue(key, val) {
+          var ctrl = formCtrl[key];
+          resource[key] = ctrl.$modelValue = val;
+          ctrl.$setDirty();
         }
 
-        if (!formCtrl.$dirty) return $q.resolve(resource);
+        function submitResource() {
+          if (formCtrl.$invalid) {
+            // touch all untouched invalid fields, to activate errors
+            var untouchedInvalidFields =
+              $element[0].querySelectorAll(invalidSelector + '.ng-untouched');
+            angular.forEach(untouchedInvalidFields, function (el) {
+              angular.element(el).controller('ngModel').$setTouched();
+            });
 
-        // if there's any on submit hook, run it
-        // if it returns a falsy value (other that undefined) then stop
-        var proceed = $scope.$eval($attrs.adResourceSubmit);
-        if (proceed !== undefined && !proceed) return $q.reject();
+            // focus the first invalid field
+            var firstInvalid = $element[0].querySelector(invalidSelector);
+            if (firstInvalid) firstInvalid.focus();
 
-        var promise = resource.id ? resource.$updateChanged(formCtrl) : resource.$save();
-        promise = promise.then(function() {
-          var nestedPromises = [];
-          angular.forEach(formCtrl, function(val, key) {
-            // nested resource!
-            if (key[0] != '$' && val && val.$submitResource) {
-              nestedPromises.push(val.$submitResource());
-            }
+            // and bail out
+            return $q.reject();
+          }
+
+          if (!formCtrl.$dirty) return $q.resolve(resource);
+
+          // if there's any on submit hook, run it
+          // if it returns a falsy value (other that undefined) then stop
+          var proceed = $scope.$eval($attrs.adResourceSubmit);
+          if (proceed !== undefined && !proceed) return $q.reject();
+
+          var promise = resource.id ? resource.$updateChanged(formCtrl) : resource.$save();
+          promise = promise.then(function() {
+            var nestedPromises = [];
+            angular.forEach(formCtrl, function(val, key) {
+              // nested resource!
+              if (key[0] != '$' && val && val.$submitResource) {
+                nestedPromises.push(val.$submitResource());
+              }
+            });
+            return $q.all(nestedPromises).then(function() {
+              formCtrl.$setPristine();
+              return resource;
+            });
+          }).catch(function(err) {
+            console.log('resource form error', err);
+            return $q.reject(err);
           });
-          return $q.all(nestedPromises).then(function() {
-            formCtrl.$setPristine();
-            return resource;
-          });
-        }).catch(function(err) {
-          console.log('resource form error', err);
-          return $q.reject(err);
-        });
 
-        $scope.$broadcast('resourceSubmitted', promise);
-        $scope.$emit('resourceSubmitted', promise)
-        return promise;
-      }
+          $scope.$broadcast('resourceSubmitted', promise);
+          $scope.$emit('resourceSubmitted', promise)
+          return promise;
+        }
+      };
     }
-  };
+  }
 }
